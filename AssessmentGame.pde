@@ -1,5 +1,9 @@
 //need to do:
 //add a sorting algorithm - potentially sorting items in the shop by price, therefore having a 'reccomendation system' on what to buy
+//add decorations, objects that are in the background and not interactable, but still move with the scrolling of the screen
+//add a block that when touched takes you to the next level
+//add a beam attack that just attacks all enemies in front of the player, don't make it too complicated, just use a similar structure to the basic attack
+//add a town with shop decorations in the background, and add a shop where more lives, higher attack power, and beam upgrades are buyable
 
 import java.util.ArrayList;
 
@@ -34,10 +38,11 @@ float differenceY;
 float screenX;
 float screenY;
 boolean displayTitleScreen;
+String blockType;
 
 void setup() {
   fullScreen();
-  player = new Player("playerRight1.png", (80*18), 80*5, 140, 80);
+  player = new Player("playerRight1.png", 80*18, 80*5, 140, 80);
   //attack = new Attack("square.png", 33*80, 11*80, 80, 80);
   blocks = new ArrayList<Block>();
   simpleEnemyList = new ArrayList<SimpleEnemy>();
@@ -45,7 +50,6 @@ void setup() {
   readCSV("testMap.txt");
   titleScreen = loadImage("titleScreen.png");
   titleScreen.resize(width,height);
-  background = loadImage("caveBackground.png");
   background.resize(width, height);
   lifeIcons = loadImage("life.png");
   coin = loadImage("coin.png");
@@ -123,6 +127,15 @@ void draw() {
           //}
         }
       }
+      
+      //checking if player has fell off the map
+      if(player.centreY > (80*15)) {
+            player.lives = player.lives - 1;
+            player.iFrames = 100;
+            image(damagedEffect, player.centreX - 200, player.centreY - 200, 400, 400);
+            player.setRight(80*18);
+            player.setTop(80*7);
+          }
       
       if(player.iFrames > 0) {
         player.iFrames = player.iFrames - 1;
@@ -302,11 +315,11 @@ void readCSV(String fileName) {
           }
           
           if(finishWhileLoop == true) { 
-            blocks.add(new Block("rockBlock.png", (SPRITE_SIZE*counter2)/2 + SPRITE_SIZE*u, SPRITE_SIZE/2 + SPRITE_SIZE*i, SPRITE_SIZE*counter2, SPRITE_SIZE));
+            blocks.add(new Block(blockType, (SPRITE_SIZE*counter2)/2 + SPRITE_SIZE*u, SPRITE_SIZE/2 + SPRITE_SIZE*i, SPRITE_SIZE*counter2, SPRITE_SIZE));
             u = u + counter2;
           }
           else {
-            blocks.add(new Block("rockBlock.png", SPRITE_SIZE/2 + SPRITE_SIZE*u, SPRITE_SIZE/2 + SPRITE_SIZE*i, SPRITE_SIZE, SPRITE_SIZE));
+            blocks.add(new Block(blockType, SPRITE_SIZE/2 + SPRITE_SIZE*u, SPRITE_SIZE/2 + SPRITE_SIZE*i, SPRITE_SIZE, SPRITE_SIZE));
           }
           blocks.get(counter).display();
           counter = counter + 1;
@@ -333,11 +346,11 @@ void readCSV(String fileName) {
           }
           
           if(finishWhileLoop == true) { 
-            blocks.add(new Block("rockBlock.png", (SPRITE_SIZE*counter2)/2 + SPRITE_SIZE*u, SPRITE_SIZE/4 + SPRITE_SIZE*i, SPRITE_SIZE*counter2, SPRITE_SIZE/2));
+            blocks.add(new Block(blockType, (SPRITE_SIZE*counter2)/2 + SPRITE_SIZE*u, SPRITE_SIZE/4 + SPRITE_SIZE*i, SPRITE_SIZE*counter2, SPRITE_SIZE/2));
             u = u + counter2;
           }
           else {
-            blocks.add(new Block("rockBlock.png", SPRITE_SIZE/2 + SPRITE_SIZE*u, SPRITE_SIZE/4 + SPRITE_SIZE*i, SPRITE_SIZE, SPRITE_SIZE/2));
+            blocks.add(new Block(blockType, SPRITE_SIZE/2 + SPRITE_SIZE*u, SPRITE_SIZE/4 + SPRITE_SIZE*i, SPRITE_SIZE, SPRITE_SIZE/2));
           }
           blocks.get(counter).display();
           counter = counter + 1;
@@ -356,6 +369,15 @@ void readCSV(String fileName) {
         case 'C': //chest
           chestList.add(new Chest("chest.png", SPRITE_SIZE/2 + SPRITE_SIZE*u, SPRITE_SIZE/2 + SPRITE_SIZE*i, SPRITE_SIZE, SPRITE_SIZE));
           break;
+          
+        case '[': //background 1
+          background = loadImage("plainsBackground.png");
+          blockType = "grassBlock.png";
+        break;
+        case ']': //background 2
+          background = loadImage("caveBackground.png");
+          blockType = "rockBlock.png";
+        break;
       }
     }
   }
